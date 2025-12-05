@@ -2,7 +2,11 @@
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
     "lib": ["ES2015"],
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "paths": {
+      // @TODO: path alias to source code, how does this work on prod?
+      "@repo/schemas": ["../../packages/schemas/src/index.ts"]
+    }
   },
   "exclude": ["node_modules"],
   "include": ["."]

@@ -1,6 +1,7 @@
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 
 import { RegisterRequest } from '@repo/schemas'
+import { userService } from '../../service/user'
 
 const example: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
   fastify.post(
@@ -12,6 +13,8 @@ const example: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => 
     },
     async (req, _res) => {
       const { email, password } = req.body
+      const rst = await userService.createUser({ name: 'teste', email })
+      console.log(`MONGO RESULT: ${rst}`)
       return { email, password }
     }
   )
