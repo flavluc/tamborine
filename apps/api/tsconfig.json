@@ -1,9 +1,8 @@
 {
-  "extends": "@repo/typescript-config/base.json",
+  "extends": "fastify-tsconfig",
   "compilerOptions": {
-    "lib": ["ES2015"],
-    "outDir": "./dist"
+    "outDir": "dist",
+    "sourceMap": true
   },
-  "exclude": ["node_modules"],
-  "include": ["."]
+  "include": ["src/**/*.ts"]
 }
