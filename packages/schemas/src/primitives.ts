@@ -1,6 +1,18 @@
 import { z } from 'zod'
 
-export const Id = z.uuid().brand<'Id'>()
+const MONGO_OBJECT_ID_REGEX = /^[a-fA-F0-9]{24}$/
+
+export const Id = z
+  .string()
+  .refine(
+    (val) => {
+      return MONGO_OBJECT_ID_REGEX.test(val)
+    },
+    {
+      message: 'Invalid MongoDB ObjectId format (must be a 24-character hex string)',
+    }
+  )
+  .brand<'Id'>()
 export type Id = z.infer<typeof Id>
 
 export const Email = z.email()

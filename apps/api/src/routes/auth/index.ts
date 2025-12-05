@@ -1,32 +1,45 @@
+// src/routes/index.ts
+import { RegisterRequest, RegisterResponse } from '@repo/schemas'
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 
-import { RegisterRequest } from '@repo/schemas'
-import { userService } from '../../service/user'
+import { isProd } from '../../config'
+import * as userService from '../../services/user'
 
-const example: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
+const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
   fastify.post(
     '/register',
     {
       schema: {
         body: RegisterRequest,
+        response: {
+          201: RegisterResponse,
+        },
       },
     },
-    async (req, _res) => {
+    async (req, reply) => {
       const { email, password } = req.body
-      const rst = await userService.createUser({ name: 'teste', email })
-      console.log(`MONGO RESULT: ${rst}`)
-      return { email, password }
+
+      //@TODO: error handling middleware
+      const user = await userService.createUser(email, password)
+      const accessToken = fastify.jwt.sign({ sub: user.id, type: 'access' }, { expiresIn: '15m' })
+      const refreshToken = fastify.jwt.sign({ sub: user.id, type: 'refresh' }, { expiresIn: '7d' })
+
+      await userService.updateUser(user.id, { refreshToken })
+
+      reply.setCookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: 'lax',
+        path: '/',
+      })
+
+      const data = {
+        user,
+        access: accessToken,
+      }
+      return reply.code(201).send({ data })
     }
   )
-  fastify.get('/login', async (_req, _res) => {
-    return 'ok'
-  })
-  fastify.get('/refresh', async (_req, _res) => {
-    return 'ok'
-  })
-  fastify.get('/logout', async (_req, _res) => {
-    return 'ok'
-  })
 }
 
-export default example
+export default auth

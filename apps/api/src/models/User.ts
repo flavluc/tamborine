@@ -1,14 +1,33 @@
-import mongoose, { Document, Model, Schema } from 'mongoose'
+import { ISODate, Id, UserDTO } from '@repo/schemas'
+import mongoose, { Document, Schema } from 'mongoose'
 
 export interface IUser extends Document {
   email: string
-  name: string
+  password: string // hashed
+  refreshToken?: string | null
+  createdAt: Date
+  updatedAt: Date
 }
 
-const userSchema = new Schema<IUser>({
-  email: { type: String, required: true, unique: true },
-  name: { type: String, required: true },
-})
+const UserSchema = new Schema<IUser>(
+  {
+    email: { type: String, unique: true, required: true, index: true },
+    password: { type: String, required: true },
+    refreshToken: { type: String, default: null },
+  },
+  {
+    timestamps: true,
+  }
+)
 
-export const UserModel: Model<IUser> =
-  mongoose.models.User || mongoose.model<IUser>('User', userSchema)
+export const UserModel = mongoose.models.User || mongoose.model<IUser>('User', UserSchema)
+
+export function toUserDTO(user: IUser): UserDTO {
+  return {
+    id: Id.parse(user._id),
+    email: user.email,
+    password: user.password,
+    createdAt: ISODate.parse(user.createdAt.toISOString()),
+    updatedAt: ISODate.parse(user.updatedAt.toISOString()),
+  }
+}

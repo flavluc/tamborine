@@ -1,10 +1,9 @@
-import { FastifyInstance } from 'fastify'
 import fp from 'fastify-plugin'
 import mongoose from 'mongoose'
 
 import { env } from '../config'
 
-const dbConnector = async (_fastify: FastifyInstance) => {
+export default fp(async (_app) => {
   try {
     if (mongoose.connection.readyState < 1) {
       await mongoose.connect(env.DATABASE_URL)
@@ -15,6 +14,4 @@ const dbConnector = async (_fastify: FastifyInstance) => {
     console.log(`MongoDB connection error: ${error}`)
     throw error
   }
-}
-
-export default fp(dbConnector)
+})

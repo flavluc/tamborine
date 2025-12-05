@@ -12,3 +12,6 @@ const Schema = z.object({
 })
 
 export const env = Schema.parse(process.env)
+export const isProd = env.NODE_ENV === 'production'
+export const isTest = env.NODE_ENV === 'test'
+export const isDev = env.NODE_ENV === 'development'

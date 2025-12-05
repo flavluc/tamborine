@@ -22,6 +22,7 @@ export const LoginResponse = z.object({
 export const RegisterResponse = z.object({
   data: z.object({
     user: UserDTO,
+    access: z.string(), // JWT
   }),
 })
 
