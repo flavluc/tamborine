@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs'
+import { QueryFilter } from 'mongoose'
 
 import { UserDTO } from '@repo/schemas'
 import { toUserDTO, UserModel, type IUser } from '../models/User'
@@ -16,12 +17,12 @@ export async function createUser(email: string, password: string): Promise<UserD
   return toUserDTO(user)
 }
 
-export async function findUserByEmail(email: string): Promise<UserDTO | null> {
-  const user = await UserModel.findOne({ email }).exec()
+export async function findUser(query: QueryFilter<IUser>): Promise<UserDTO | null> {
+  const user = await UserModel.findOne(query).exec()
   return user ? toUserDTO(user) : null
 }
 
-export async function verifyUserPassword(user: IUser, password: string): Promise<boolean> {
+export async function verifyUserPassword(user: UserDTO, password: string): Promise<boolean> {
   return bcrypt.compare(password, user.password)
 }
 

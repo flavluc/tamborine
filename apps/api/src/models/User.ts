@@ -1,13 +1,15 @@
 import { ISODate, Id, UserDTO } from '@repo/schemas'
-import mongoose, { Document, Schema } from 'mongoose'
+import mongoose, { Schema, type HydratedDocument, type Model } from 'mongoose'
 
-export interface IUser extends Document {
+export interface IUser {
   email: string
   password: string // hashed
   refreshToken?: string | null
   createdAt: Date
   updatedAt: Date
 }
+
+export type UserDocument = HydratedDocument<IUser>
 
 const UserSchema = new Schema<IUser>(
   {
@@ -20,9 +22,10 @@ const UserSchema = new Schema<IUser>(
   }
 )
 
-export const UserModel = mongoose.models.User || mongoose.model<IUser>('User', UserSchema)
+export const UserModel: Model<IUser> =
+  (mongoose.models.User as Model<IUser>) || mongoose.model<IUser>('User', UserSchema)
 
-export function toUserDTO(user: IUser): UserDTO {
+export function toUserDTO(user: UserDocument): UserDTO {
   return {
     id: Id.parse(user._id.toString()),
     email: user.email,
