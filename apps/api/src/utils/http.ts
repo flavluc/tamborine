@@ -1,4 +1,4 @@
-import { type FastifyReply } from 'fastify'
+import { type FastifyError, type FastifyReply } from 'fastify'
 
 import { ErrorCode, HttpStatus } from '@repo/schemas'
 import { ApiError, Errors } from '../utils/errors'
@@ -21,6 +21,12 @@ export const notFound = (res: FastifyReply) => {
 
 export const badRequest = (res: FastifyReply, error: unknown) => {
   res.status(HttpStatus.BAD_REQUEST).send({ error: Errors.Validation(error) })
+}
+
+export const fastifyError = (res: FastifyReply, error: FastifyError) => {
+  res
+    .status(error.statusCode || HttpStatus.INTERNAL_SERVER_ERROR)
+    .send({ error: Errors.Internal(error.message) })
 }
 
 export const internalError = (res: FastifyReply) => {

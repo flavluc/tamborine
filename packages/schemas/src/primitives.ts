@@ -21,12 +21,13 @@ export const Password = z.string().min(6).max(128)
 export const ISODate = z.iso.datetime({ offset: true }).brand<'ISODate'>()
 export type ISODate = z.infer<typeof ISODate>
 
+export const ItemResponse = <T extends z.ZodTypeAny>(item: T) => z.object({ data: item })
+
 export const ListResponse = <T extends z.ZodTypeAny>(item: T) =>
   z.object({
     data: z.array(item),
+    total: z.number().int().nonnegative(),
   })
-
-export const ItemResponse = <T extends z.ZodTypeAny>(item: T) => z.object({ data: item })
 
 export enum HttpStatus {
   OK = 200,

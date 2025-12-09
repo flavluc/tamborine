@@ -1,6 +1,7 @@
-import { Connection } from 'mongoose' // Mongoose connection type
-import { UserService } from '../services/user.service' // Your functional service type
-import { Env } from './env' // Your Zod/Env type
+import 'fastify'
+import { Connection } from 'mongoose'
+import { UserService } from '../services/user.service'
+import { Env } from './env'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -11,5 +12,6 @@ declare module 'fastify' {
     services: {
       users: UserService
     }
+    authenticate(request: FastifyRequest, reply: FastifyReply): Promise<void>
   }
 }

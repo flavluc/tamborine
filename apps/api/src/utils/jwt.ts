@@ -1,23 +1,11 @@
+import type { JWT } from '@fastify/jwt'
 import { randomUUID } from 'crypto'
 import type { FastifyReply } from 'fastify'
+import type { JwtPayload } from '../types/jwt'
 
 import { Errors } from '../utils'
 
-export type TokenType = 'access' | 'refresh'
-
-export interface AuthJwtPayload {
-  sub: string
-  type: TokenType
-  iat: number
-  exp: number
-}
-
-export interface JwtPort {
-  sign: (payload: object, options?: { expiresIn?: string }) => string
-  verify: <T = AuthJwtPayload>(token: string) => T
-}
-
-export function createJwtHelpers(jwt: JwtPort) {
+export function createJwtHelpers(jwt: JWT) {
   const issueTokens = (userId: string) => {
     const access = jwt.sign(
       { sub: userId, type: 'access', jti: randomUUID() },
@@ -32,33 +20,26 @@ export function createJwtHelpers(jwt: JwtPort) {
     return { access, refresh }
   }
 
-  const verifyRefresh = (token: string): AuthJwtPayload => {
-    let payload
+  const verifyRefresh = (token: string): JwtPayload => {
+    let payload: JwtPayload
+
     try {
-      payload = jwt.verify<AuthJwtPayload>(token)
+      payload = jwt.verify<JwtPayload>(token)
     } catch {
       throw Errors.Auth.TokenExpired()
     }
+
     if (payload.type !== 'refresh') {
       throw Errors.Auth.TokenExpired()
     }
+
     return payload
   }
 
-  const verifyAccess = (token: string): AuthJwtPayload => {
-    let payload
-    try {
-      payload = jwt.verify<AuthJwtPayload>(token)
-    } catch {
-      throw Errors.Auth.TokenExpired()
-    }
-    if (payload.type !== 'access') {
-      throw Errors.Auth.TokenExpired()
-    }
-    return payload
+  return {
+    issueTokens,
+    verifyRefresh,
   }
-
-  return { issueTokens, verifyRefresh, verifyAccess }
 }
 
 export function setRefreshTokenCookie(reply: FastifyReply, token: string, secure: boolean) {

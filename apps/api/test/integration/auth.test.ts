@@ -1,20 +1,19 @@
-// tests/auth.int.test.ts
 import { FastifyInstance } from 'fastify'
 import { UserModel } from '../../src/models/User'
 import { MongoTestContainer, withDatabase, withServer } from '../helpers'
 
-describe('Authentication Integration Tests', () => {
+describe('Authentication Integration', () => {
   let app: FastifyInstance
   let container: MongoTestContainer
 
   beforeAll(async () => {
     container = await withDatabase()
     app = await withServer(container.uri)
-  }, 20_000)
+  })
 
   afterAll(async () => {
-    await app.close()
-    await container.close()
+    if (app) await app.close()
+    if (container) await container.close()
   })
 
   afterEach(async () => {

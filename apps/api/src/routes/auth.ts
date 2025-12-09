@@ -8,20 +8,15 @@ import {
   RegisterRequest,
   RegisterResponse,
 } from '@repo/schemas'
-import { isProd } from '../../config'
-import * as userService from '../../services/user'
-import {
-  clearRefreshTokenCookie,
-  createJwtHelpers,
-  Errors,
-  setRefreshTokenCookie,
-} from '../../utils'
+import { isProd } from '../config'
+import * as userService from '../services/user'
+import { clearRefreshTokenCookie, createJwtHelpers, Errors, setRefreshTokenCookie } from '../utils'
 
 const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
   const { issueTokens, verifyRefresh } = createJwtHelpers(fastify.jwt)
 
   fastify.post(
-    '/register',
+    '/auth/register',
     {
       schema: {
         body: RegisterRequest,
@@ -51,7 +46,7 @@ const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
   )
 
   fastify.post(
-    '/login',
+    '/auth/login',
     {
       schema: {
         body: LoginRequest,
@@ -94,7 +89,7 @@ const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
   )
 
   fastify.post(
-    '/refresh',
+    '/auth/refresh',
     {
       schema: {
         response: {
@@ -130,7 +125,7 @@ const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
   )
 
   fastify.post(
-    '/logout',
+    '/auth/logout',
     {
       schema: {
         response: {

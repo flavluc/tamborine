@@ -9,11 +9,11 @@ describe('OPS endpoints tests', () => {
   beforeAll(async () => {
     container = await withDatabase()
     app = await withServer(container.uri)
-  }, 20_000)
+  })
 
   afterAll(async () => {
-    await app.close()
-    await container.close()
+    if (app) await app.close()
+    if (container) await container.close()
   })
 
   test('GET /healthz should return ok', async () => {
