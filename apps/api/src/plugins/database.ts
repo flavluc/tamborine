@@ -1,15 +1,13 @@
 import fp from 'fastify-plugin'
 import mongoose from 'mongoose'
 
-import { env } from '../config'
-
-export default fp(async (_app) => {
+export default fp(async (app) => {
   try {
-    if (mongoose.connection.readyState < 1) {
-      await mongoose.connect(env.DATABASE_URL)
-      // @TODO: use shared logger? another logger lib?
-      console.log('MongoDB connected')
-    }
+    await mongoose.connect(app.config.DATABASE_URL, {
+      directConnection: true,
+    })
+    // @TODO: use shared logger? another logger lib?
+    console.log('MongoDB connected')
   } catch (error) {
     console.log(`MongoDB connection error: ${error}`)
     throw error

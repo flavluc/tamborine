@@ -1,4 +1,3 @@
-// src/services/user.ts
 import bcrypt from 'bcryptjs'
 
 import { UserDTO } from '@repo/schemas'

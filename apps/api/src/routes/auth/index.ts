@@ -28,7 +28,7 @@ const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
 
       reply.setCookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: isProd,
+        secure: isProd(fastify.config),
         sameSite: 'lax',
         path: '/',
       })

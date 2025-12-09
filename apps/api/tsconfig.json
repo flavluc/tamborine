@@ -8,6 +8,7 @@
       "@repo/schemas": ["../../packages/schemas/src/index.ts"]
     }
   },
+  "types": ["node", "jest"],
   "exclude": ["node_modules"],
   "include": ["."]
 }

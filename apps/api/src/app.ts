@@ -1,31 +1,47 @@
 import AutoLoad from '@fastify/autoload'
 import cookie from '@fastify/cookie'
+import fenv from '@fastify/env'
 import jwt from '@fastify/jwt'
+import ajvFormats from 'ajv-formats'
 import Fastify, { type FastifyInstance } from 'fastify'
 import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { z } from 'zod'
 
-import { env } from './config'
+import { Env, Schema } from './config'
 import dbConnector from './plugins/database'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-export const createServer = async (): Promise<FastifyInstance> => {
+export const createServer = async (env: Env): Promise<FastifyInstance> => {
+  // @TODO: zod 4 has native json schema conversion, should we still use type provider?
   const app = Fastify({
     logger: true,
+    pluginTimeout: 30000,
   }).withTypeProvider<ZodTypeProvider>()
 
   app.setValidatorCompiler(validatorCompiler)
   app.setSerializerCompiler(serializerCompiler)
+
+  await app.register(fenv, {
+    schema: z.toJSONSchema(Schema, { target: 'draft-7' }),
+    data: env,
+    ajv: {
+      customOptions: (ajvInstance) => {
+        ajvFormats(ajvInstance)
+        return ajvInstance
+      },
+    },
+  })
 
   await app.register(dbConnector)
 
   await app.register(cookie)
 
   await app.register(jwt, {
-    secret: env.JWT_ACCESS_SECRET,
+    secret: app.config.JWT_ACCESS_SECRET,
   })
 
   await app.register(AutoLoad, {

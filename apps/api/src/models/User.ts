@@ -24,7 +24,7 @@ export const UserModel = mongoose.models.User || mongoose.model<IUser>('User', U
 
 export function toUserDTO(user: IUser): UserDTO {
   return {
-    id: Id.parse(user._id),
+    id: Id.parse(user._id.toString()),
     email: user.email,
     password: user.password,
     createdAt: ISODate.parse(user.createdAt.toISOString()),
