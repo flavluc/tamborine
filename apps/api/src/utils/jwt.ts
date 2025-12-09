@@ -1,4 +1,7 @@
+import { randomUUID } from 'crypto'
 import type { FastifyReply } from 'fastify'
+
+import { Errors } from '../utils'
 
 export type TokenType = 'access' | 'refresh'
 
@@ -16,25 +19,41 @@ export interface JwtPort {
 
 export function createJwtHelpers(jwt: JwtPort) {
   const issueTokens = (userId: string) => {
-    const access = jwt.sign({ sub: userId, type: 'access' }, { expiresIn: '15m' })
+    const access = jwt.sign(
+      { sub: userId, type: 'access', jti: randomUUID() },
+      { expiresIn: '15m' }
+    )
 
-    const refresh = jwt.sign({ sub: userId, type: 'refresh' }, { expiresIn: '7d' })
+    const refresh = jwt.sign(
+      { sub: userId, type: 'refresh', jti: randomUUID() },
+      { expiresIn: '7d' }
+    )
 
     return { access, refresh }
   }
 
   const verifyRefresh = (token: string): AuthJwtPayload => {
-    const payload = jwt.verify<AuthJwtPayload>(token)
+    let payload
+    try {
+      payload = jwt.verify<AuthJwtPayload>(token)
+    } catch {
+      throw Errors.Auth.TokenExpired()
+    }
     if (payload.type !== 'refresh') {
-      throw new Error('INVALID_REFRESH_TOKEN')
+      throw Errors.Auth.TokenExpired()
     }
     return payload
   }
 
   const verifyAccess = (token: string): AuthJwtPayload => {
-    const payload = jwt.verify<AuthJwtPayload>(token)
+    let payload
+    try {
+      payload = jwt.verify<AuthJwtPayload>(token)
+    } catch {
+      throw Errors.Auth.TokenExpired()
+    }
     if (payload.type !== 'access') {
-      throw new Error('INVALID_ACCESS_TOKEN')
+      throw Errors.Auth.TokenExpired()
     }
     return payload
   }

@@ -3,12 +3,12 @@ import { QueryFilter } from 'mongoose'
 
 import { UserDTO } from '@repo/schemas'
 import { toUserDTO, UserModel, type IUser } from '../models/User'
+import { Errors } from '../utils'
 
 export async function createUser(email: string, password: string): Promise<UserDTO> {
   const existing = await UserModel.findOne({ email }).exec()
   if (existing) {
-    //@TODO: improve error handling
-    throw new Error('EMAIL_ALREADY_IN_USE')
+    throw Errors.Conflict('Email already registered')
   }
 
   const hashed = await bcrypt.hash(password, 10)

@@ -1,15 +1,22 @@
+import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
+
 import {
+  ErrorEnvelope,
   LoginRequest,
   LoginResponse,
   RefreshResponse,
   RegisterRequest,
   RegisterResponse,
 } from '@repo/schemas'
-import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
-import { clearRefreshTokenCookie, createJwtHelpers, setRefreshTokenCookie } from '../../utils'
-
 import { isProd } from '../../config'
 import * as userService from '../../services/user'
+import {
+  clearRefreshTokenCookie,
+  createJwtHelpers,
+  Errors,
+  setRefreshTokenCookie,
+} from '../../utils'
+
 const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
   const { issueTokens, verifyRefresh } = createJwtHelpers(fastify.jwt)
 
@@ -20,6 +27,8 @@ const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
         body: RegisterRequest,
         response: {
           201: RegisterResponse,
+          '4xx': ErrorEnvelope,
+          '5xx': ErrorEnvelope,
         },
       },
     },
@@ -30,7 +39,6 @@ const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
       const tokens = issueTokens(user.id)
 
       await userService.updateUser(user.id, { refreshToken: tokens.refresh })
-
       setRefreshTokenCookie(reply, tokens.refresh, isProd(fastify.config))
 
       return reply.code(201).send({
@@ -49,6 +57,8 @@ const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
         body: LoginRequest,
         response: {
           200: LoginResponse,
+          '4xx': ErrorEnvelope,
+          '5xx': ErrorEnvelope,
         },
       },
     },
@@ -57,20 +67,19 @@ const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
 
       const userDoc = await userService.findUser({ email })
       if (!userDoc) {
-        throw new Error('INVALID_CREDENTIALS')
+        throw Errors.Auth.InvalidCredentials()
       }
 
       const ok = await userService.verifyUserPassword(userDoc, password)
       if (!ok) {
-        throw new Error('INVALID_CREDENTIALS')
+        throw Errors.Auth.InvalidCredentials()
       }
 
       const userId = userDoc.id
       const tokens = issueTokens(userId)
-
       const user = await userService.updateUser(userId, { refreshToken: tokens.refresh })
       if (!user) {
-        throw new Error('USER_NOT_FOUND')
+        throw Errors.Auth.InvalidCredentials()
       }
 
       setRefreshTokenCookie(reply, tokens.refresh, isProd(fastify.config))
@@ -90,23 +99,24 @@ const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
       schema: {
         response: {
           200: RefreshResponse,
+          '4xx': ErrorEnvelope,
+          '5xx': ErrorEnvelope,
         },
       },
     },
     async (req, reply) => {
       const cookieToken = req.cookies.refreshToken as string | undefined
       if (!cookieToken) {
-        throw new Error('MISSING_REFRESH_TOKEN')
+        throw Errors.Auth.MissingToken()
       }
 
       const payload = verifyRefresh(cookieToken)
       const userId = payload.sub
-
       const tokens = issueTokens(userId)
 
       const user = await userService.updateUser(userId, { refreshToken: tokens.refresh })
       if (!user) {
-        throw new Error('USER_NOT_FOUND')
+        throw Errors.Auth.InvalidCredentials()
       }
 
       setRefreshTokenCookie(reply, tokens.refresh, isProd(fastify.config))
@@ -122,7 +132,12 @@ const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
   fastify.post(
     '/logout',
     {
-      schema: {},
+      schema: {
+        response: {
+          '4xx': ErrorEnvelope,
+          '5xx': ErrorEnvelope,
+        },
+      },
     },
     async (req, reply) => {
       const cookieToken = req.cookies.refreshToken
@@ -131,13 +146,11 @@ const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
         try {
           const payload = verifyRefresh(cookieToken)
           const userId = payload.sub
-          await userService.updateUser(userId, { refreshToken: undefined })
-        } catch {
-          // ignore errors on logout
+          await userService.updateUser(userId, { refreshToken: null })
+        } finally {
+          clearRefreshTokenCookie(reply)
         }
       }
-
-      clearRefreshTokenCookie(reply)
 
       return reply.code(204).send()
     }

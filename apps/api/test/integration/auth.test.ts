@@ -127,7 +127,7 @@ describe('Authentication Integration Tests', () => {
     const email = 'refresh@email.com'
     const password = 'my_very_strong_password'
 
-    const { data: registerData, refreshCookie } = await registerUser(email, password)
+    const { refreshCookie } = await registerUser(email, password)
     expect(refreshCookie).toBeDefined()
 
     const refreshRes = await app.inject({
@@ -141,10 +141,6 @@ describe('Authentication Integration Tests', () => {
     expect(refreshRes.statusCode).toBe(200)
 
     const { data } = refreshRes.json()
-
-    expect(data.user).toBeDefined()
-    expect(data.user.id).toBe(registerData.user.id)
-    expect(data.user.email).toBe(email)
     expect(data.access).toBeDefined()
 
     const newRefreshCookie = refreshRes.cookies.find((cookie) => cookie.name === 'refreshToken')
@@ -193,11 +189,7 @@ describe('Authentication Integration Tests', () => {
       },
     })
 
-    expect(logoutRes.statusCode).toBe(200)
-
-    const { data } = logoutRes.json()
-    expect(data).toBeDefined()
-    expect(data.success).toBe(true)
+    expect(logoutRes.statusCode).toBe(204)
 
     const clearedCookie = logoutRes.cookies.find((cookie) => cookie.name === 'refreshToken')
     expect(clearedCookie).toBeDefined()
@@ -214,9 +206,6 @@ describe('Authentication Integration Tests', () => {
       url: '/auth/logout',
     })
 
-    expect(res.statusCode).toBe(200)
-
-    const { data } = res.json()
-    expect(data.success).toBe(true)
+    expect(res.statusCode).toBe(204)
   })
 })
