@@ -1,31 +1,37 @@
-import { log } from '@repo/logger'
-import { CounterButton } from '@repo/ui/counter-button'
-import { Link } from '@repo/ui/link'
+'use client'
 
-export const metadata = {
-  title: 'Store | Kitchen Sink',
-}
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
-export default function Store() {
-  log('Hey! This is the Store page.')
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useToken } from '@/lib/token'
+
+export default function HomePage() {
+  const router = useRouter()
+  const accessToken = useToken((s) => s.accessToken)
 
   return (
-    <div className="container">
-      <h1 className="title">
-        Store <br />
-        <span>Kitchen Sink</span>
-      </h1>
-      <CounterButton />
-      <p className="description">
-        Built With{' '}
-        <Link href="https://turborepo.com" newTab>
-          Turborepo
-        </Link>
-        {' & '}
-        <Link href="https://nextjs.org/" newTab>
-          Next.js
-        </Link>
-      </p>
+    <div className="flex h-screen items-center justify-center bg-gray-50">
+      <Card className="w-[450px] shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-center text-2xl font-semibold">Tamborine</CardTitle>
+        </CardHeader>
+        <CardContent className="text-center space-y-4">
+          <p className="text-gray-600">A simple Transaction Processing system for Tamborine.</p>
+
+          <div className="flex flex-col space-y-3">
+            <Button asChild className="w-full">
+              {/* Using asChild props allows shadcn Button to act as a Link */}
+              <Link href="/login">Go to Login</Link>
+            </Button>
+
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/register">Go to Register</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import AutoLoad from '@fastify/autoload'
 import cookie from '@fastify/cookie'
+import cors from '@fastify/cors'
 import fenv from '@fastify/env'
 import jwt from '@fastify/jwt'
 import ajvFormats from 'ajv-formats'
@@ -54,6 +55,13 @@ export const createServer = async (env: Env): Promise<FastifyInstance> => {
   await app.register(dbConnector)
 
   await app.register(cookie)
+
+  await app.register(cors, {
+    origin: env.WEB_URL,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
 
   await app.register(jwt, {
     secret: app.config.JWT_ACCESS_SECRET,

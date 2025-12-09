@@ -1,7 +1,6 @@
 {
   "name": "api",
   "version": "1.0.0",
-  "description": "This project was bootstrapped with Fastify-CLI.",
   "type": "module",
   "private": true,
   "scripts": {
@@ -15,6 +14,7 @@
   "dependencies": {
     "@fastify/autoload": "^6.0.0",
     "@fastify/cookie": "^11.0.2",
+    "@fastify/cors": "^11.1.0",
     "@fastify/env": "^5.0.3",
     "@fastify/jwt": "^10.0.0",
     "@fastify/sensible": "^6.0.0",
