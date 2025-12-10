@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
-import { useAuth } from '@/lib/token'
+import { useAuth } from '@/lib/session'
 
 type FormData = z.infer<typeof LoginRequest>
 

@@ -27,7 +27,6 @@ export async function create({
 
   const transaction = await TransactionModel.create({
     userId: new mongoose.Types.ObjectId(userId),
-    //@TODO: should I mask pan at storage level?
     pan,
     brand,
     amount,

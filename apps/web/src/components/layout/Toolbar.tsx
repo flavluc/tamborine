@@ -2,21 +2,28 @@
 
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { api } from '@/lib/api'
-import { useAuth } from '@/lib/token'
+import { useAuth } from '@/lib/session'
 
 export default function Toolbar() {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { user, accessToken, clear } = useAuth()
+  const user = useAuth((state) => state.user)
+  const clear = useAuth((state) => state.clear)
+
+  const [loggingOut, setLoggingOut] = useState(false)
 
   async function handleLogout() {
+    if (loggingOut) return
+
+    setLoggingOut(true)
     try {
       await api('/auth/logout', { method: 'POST' })
-    } catch (err) {
-      console.error(`Logout error: ${JSON.stringify(err)}`)
+    } catch {
+      // logout is best-effort; ignore errors
     } finally {
       clear()
       queryClient.clear()
@@ -29,19 +36,19 @@ export default function Toolbar() {
       <h1 className="text-lg font-semibold tracking-tight">Tamborine</h1>
 
       <div className="flex items-center space-x-4">
-        {accessToken && user ? (
-          <>
-            <span className="text-sm text-gray-600">{user.name}</span>
+        <span className="text-sm text-gray-600">{user!.name}</span>
 
-            <Button className="cursor-pointer" variant="outline" onClick={handleLogout}>
-              Logout
-            </Button>
-          </>
-        ) : (
-          <Button className="cursor-pointer" onClick={() => router.push('/login')}>
-            Login
-          </Button>
-        )}
+        <Button
+          variant="outline"
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className="cursor-pointer flex items-center gap-2"
+        >
+          {loggingOut && (
+            <span className="h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+          )}
+          Logout
+        </Button>
       </div>
     </header>
   )

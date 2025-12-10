@@ -1,7 +1,7 @@
 'use client'
 
 import { env } from './env'
-import { useAuth } from './token'
+import { useAuth } from './session'
 
 let refreshing: Promise<string | null> | null = null
 

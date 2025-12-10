@@ -1,23 +1,28 @@
 'use client'
 
-import { useAuth } from '@/lib/token'
+import { FullscreenLoader } from '@/components/ui/loader'
+import { useAuth } from '@/lib/session'
 import { useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { useEffect } from 'react'
 
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
   const router = useRouter()
-  const { accessToken } = useAuth()
+  const accessToken = useAuth((state) => state.accessToken)
+  const hasHydrated = useAuth((state) => state.hasHydrated)
 
-  //@TODO: it's redirecting to login and then back to dashboard
   useEffect(() => {
-    if (!accessToken) {
-      router.replace('/login')
-    }
-  }, [accessToken, router])
+    if (!hasHydrated) return
+    if (!accessToken) router.replace('/login')
+  }, [accessToken, hasHydrated, router])
 
-  //@TODO: add redirecting UI like a loading
-  if (!accessToken) return null
+  if (!hasHydrated) {
+    return <FullscreenLoader />
+  }
+
+  if (!accessToken) {
+    return null
+  }
 
   return children
 }
