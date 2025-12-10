@@ -11,14 +11,12 @@ import { fileURLToPath } from 'url'
 import { z, ZodError } from 'zod'
 
 import { Env, Schema } from './config'
-import dbConnector from './plugins/database'
 import { ApiError, apiError, badRequest, fastifyError, internalError } from './utils'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 export const createServer = async (env: Env): Promise<FastifyInstance> => {
-  // @TODO: zod 4 has native json schema conversion, should we still use type provider?
   const app = Fastify({
     logger: true,
   }).withTypeProvider<ZodTypeProvider>()
@@ -27,8 +25,7 @@ export const createServer = async (env: Env): Promise<FastifyInstance> => {
   app.setSerializerCompiler(serializerCompiler)
 
   app.setErrorHandler((error, _req, reply) => {
-    //@TODO: test if this is working, i think  it comes wrapped into FastifyError
-    //@TODO: improve error handling, it's pretty bad and mixed with FastifyError
+    //@TODO: add proper logging
     console.error(error)
 
     if (error instanceof ZodError) return badRequest(reply, z.treeifyError(error))
@@ -38,7 +35,6 @@ export const createServer = async (env: Env): Promise<FastifyInstance> => {
     const ferror = error as FastifyError
     if ('code' in ferror && ferror.code.startsWith('FST_')) return fastifyError(reply, ferror)
 
-    // @TODO: add proper logging
     return internalError(reply)
   })
 
@@ -52,8 +48,6 @@ export const createServer = async (env: Env): Promise<FastifyInstance> => {
       },
     },
   })
-
-  await app.register(dbConnector)
 
   await app.register(cookie)
 

@@ -4,7 +4,6 @@
     "lib": ["ES2015"],
     "outDir": "./dist",
     "paths": {
-      // @TODO: path alias to source code, how does this work on prod?
       "@repo/schemas": ["../../packages/schemas/src/index.ts"]
     }
   },

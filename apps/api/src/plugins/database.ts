@@ -6,7 +6,15 @@ export default fp(async (app) => {
     await mongoose.connect(app.config.DATABASE_URL, {
       directConnection: true,
     })
-    // @TODO: use shared logger? another logger lib?
+
+    app.decorate('isDbReady', async () => {
+      const db = mongoose.connection.db
+      if (!db) return false
+
+      await db.admin().ping()
+      return true
+    })
+
     console.log('MongoDB connected')
   } catch (error) {
     console.log(`MongoDB connection error: ${error}`)

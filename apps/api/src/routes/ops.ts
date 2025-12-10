@@ -5,9 +5,14 @@ const root: FastifyPluginAsync = async (app, _opts): Promise<void> => {
     return 'ok'
   })
 
-  app.get('/readyz', (_req, _res) => {
-    // @TODO: check DB connectivity here
-    return 'ready'
+  app.get('/readyz', async (_req, res) => {
+    try {
+      await app.isDbReady()
+      return 'ready'
+    } catch {
+      res.code(503)
+      return 'not ready'
+    }
   })
 }
 

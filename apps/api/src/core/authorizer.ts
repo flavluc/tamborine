@@ -9,7 +9,6 @@ interface AuthorizeResult {
   reason?: string
 }
 
-//@TODO: lots of these decision rules are redundant. some can be ensured by the DB (source of truth) but I think this is still necessary for some specific reasons. Think about it later.
 export function authorize({ pan, brand, amount }: AuthorizeInput): AuthorizeResult {
   if (!/^\d{16}$/.test(pan)) {
     return {

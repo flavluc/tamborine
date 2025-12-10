@@ -13,5 +13,6 @@ declare module 'fastify' {
       users: UserService
     }
     authenticate(request: FastifyRequest, reply: FastifyReply): Promise<void>
+    isDbReady(): Promise<boolean>
   }
 }
