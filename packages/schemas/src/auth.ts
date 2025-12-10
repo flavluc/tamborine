@@ -32,6 +32,7 @@ export const RegisterResponse = z.object({
 
 export const RefreshResponse = z.object({
   data: z.object({
+    user: UserDTO,
     access: z.string(),
   }),
 })

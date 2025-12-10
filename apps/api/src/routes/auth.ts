@@ -118,6 +118,7 @@ const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
 
       return reply.code(200).send({
         data: {
+          user,
           access: tokens.access,
         },
       })
