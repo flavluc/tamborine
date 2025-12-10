@@ -5,7 +5,6 @@ export const Schema = z.object({
   PORT: z.coerce.number().default(3001),
   DATABASE_URL: z.url(),
   JWT_ACCESS_SECRET: z.string().min(16),
-  JWT_REFRESH_SECRET: z.string().min(16),
   WEB_URL: z.url().default('http://localhost:3000'),
 })
 

@@ -14,9 +14,10 @@
       {
         devShell = pkgs.mkShell {
           buildInputs = [
+            pkgs.git
+            pkgs.mongodb
             pkgs.nodejs_22
             pkgs.pnpm
-            pkgs.git
             pkgs.turbo
           ];
         };
