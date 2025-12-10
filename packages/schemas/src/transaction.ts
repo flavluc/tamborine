@@ -7,10 +7,16 @@ export type TransactionStatus = z.infer<typeof TransactionStatus>
 export const TransactionBrand = z.enum(['Visa', 'Mastercard', 'Elo'])
 export type TransactionBrand = z.infer<typeof TransactionBrand>
 
+export const TransactionPan = z
+  .string()
+  .length(16, 'PAN must be exactly 16 digits')
+  .regex(/^\d+$/, 'PAN must contain only digits')
+export type TransactionPan = z.infer<typeof TransactionPan>
+
 export const TransactionDTO = z.object({
   id: Id,
   userId: Id,
-  pan: z.string(),
+  pan: TransactionPan,
   brand: TransactionBrand,
   amount: z.number().positive(),
   status: TransactionStatus,
@@ -23,12 +29,13 @@ export const TransactionItem = ItemResponse(TransactionDTO)
 export const TransactionList = ListResponse(TransactionDTO)
 
 export const CreateTransactionRequest = z.object({
-  pan: z.string().regex(/^\d+$/, 'PAN must contain only digits'),
+  pan: TransactionPan,
   brand: TransactionBrand,
   amount: z.number().positive(),
 })
 export type CreateTransactionRequest = z.infer<typeof CreateTransactionRequest>
 export const CreateTransactionResponse = ItemResponse(TransactionDTO)
+export type CreateTransactionResponse = z.infer<typeof CreateTransactionResponse>
 
 export const GetTransactionsQuery = z.object({
   page: z.coerce.number().int().positive().default(1),
@@ -37,3 +44,4 @@ export const GetTransactionsQuery = z.object({
 })
 export type GetTransactionsQuery = z.infer<typeof GetTransactionsQuery>
 export const GetTransactionsResponse = ListResponse(TransactionDTO)
+export type GetTransactionsResponse = z.infer<typeof GetTransactionsResponse>

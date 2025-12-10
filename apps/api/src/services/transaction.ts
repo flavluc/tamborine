@@ -5,11 +5,6 @@ import { TransactionModel, toTransactionDTO } from '../models/Transaction'
 
 type TransactionStatus = 'approved' | 'declined'
 
-const mask = (pan: string) => {
-  const last4 = pan.slice(-4)
-  return `************${last4}`
-}
-
 const authCode = () => {
   // 6 digits
   return Math.floor(100000 + Math.random() * 900000).toString()
@@ -32,7 +27,8 @@ export async function create({
 
   const transaction = await TransactionModel.create({
     userId: new mongoose.Types.ObjectId(userId),
-    pan: mask(pan),
+    //@TODO: should I mask pan at storage level?
+    pan,
     brand,
     amount,
     status: auth.status,

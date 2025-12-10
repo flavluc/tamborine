@@ -29,6 +29,8 @@ export const createServer = async (env: Env): Promise<FastifyInstance> => {
   app.setErrorHandler((error, _req, reply) => {
     //@TODO: test if this is working, i think  it comes wrapped into FastifyError
     //@TODO: improve error handling, it's pretty bad and mixed with FastifyError
+    console.error(error)
+
     if (error instanceof ZodError) return badRequest(reply, z.treeifyError(error))
 
     if (error instanceof ApiError) return apiError(reply, error)
@@ -37,7 +39,6 @@ export const createServer = async (env: Env): Promise<FastifyInstance> => {
     if ('code' in ferror && ferror.code.startsWith('FST_')) return fastifyError(reply, ferror)
 
     // @TODO: add proper logging
-    console.error(error)
     return internalError(reply)
   })
 
