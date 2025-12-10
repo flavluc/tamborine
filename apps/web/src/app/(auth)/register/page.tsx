@@ -10,17 +10,17 @@ import { Button } from '@/components/ui/button'
 import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
-import { useToken } from '@/lib/token'
+import { useAuth } from '@/lib/token'
 
 type FormData = z.infer<typeof RegisterRequest>
 
 export default function RegisterPage() {
   const router = useRouter()
-  const setToken = useToken((s) => s.setToken)
+  const setSession = useAuth((s) => s.setSession)
 
   const form = useForm<FormData>({
     resolver: zodResolver(RegisterRequest),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: '', password: '', name: '' },
   })
 
   async function onSubmit(values: FormData) {
@@ -31,7 +31,7 @@ export default function RegisterPage() {
       })
 
       const parsed = RegisterResponse.parse(res)
-      setToken(parsed.data.access)
+      setSession(parsed.data.access, parsed.data.user)
 
       router.push('/dashboard')
     } catch (err) {
@@ -49,6 +49,17 @@ export default function RegisterPage() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <Input type="text" placeholder="Your name" autoComplete="name" {...field} />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             name="email"
             render={({ field }) => (

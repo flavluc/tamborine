@@ -5,14 +5,20 @@ import { UserDTO } from '@repo/schemas'
 import { toUserDTO, UserModel, type IUser } from '../models/User'
 import { Errors } from '../utils'
 
-export async function createUser(email: string, password: string): Promise<UserDTO> {
+type CreateParams = {
+  email: string
+  password: string
+  name: string
+}
+
+export async function createUser({ email, password, name }: CreateParams): Promise<UserDTO> {
   const existing = await UserModel.findOne({ email }).exec()
   if (existing) {
     throw Errors.Conflict('Email already registered')
   }
 
   const hashed = await bcrypt.hash(password, 10)
-  const user = new UserModel({ email, password: hashed })
+  const user = new UserModel({ email, password: hashed, name })
   await user.save()
   return toUserDTO(user)
 }

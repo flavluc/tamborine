@@ -1,16 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useToken } from '@/lib/token'
 
 export default function HomePage() {
-  const router = useRouter()
-  const accessToken = useToken((s) => s.accessToken)
-
   return (
     <div className="flex h-screen items-center justify-center bg-gray-50">
       <Card className="w-[450px] shadow-lg">

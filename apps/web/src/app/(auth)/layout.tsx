@@ -1,12 +1,12 @@
 'use client'
 
-import { useToken } from '@/lib/token'
+import { useAuth } from '@/lib/token'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const { accessToken } = useToken()
+  const { accessToken } = useAuth()
 
   useEffect(() => {
     if (accessToken) {

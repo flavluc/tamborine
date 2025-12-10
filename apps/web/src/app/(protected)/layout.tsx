@@ -1,13 +1,13 @@
 'use client'
 
-import { useToken } from '@/lib/token'
+import { useAuth } from '@/lib/token'
 import { useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { useEffect } from 'react'
 
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
   const router = useRouter()
-  const { accessToken } = useToken()
+  const { accessToken } = useAuth()
 
   //@TODO: it's redirecting to login and then back to dashboard
   useEffect(() => {
@@ -16,7 +16,7 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
     }
   }, [accessToken, router])
 
-  //@TODO: add redirecting UI
+  //@TODO: add redirecting UI like a loading
   if (!accessToken) return null
 
   return children

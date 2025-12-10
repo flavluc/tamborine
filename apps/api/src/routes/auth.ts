@@ -28,9 +28,9 @@ const auth: FastifyPluginAsyncZod = async (fastify, _opts): Promise<void> => {
       },
     },
     async (req, reply) => {
-      const { email, password } = req.body
+      const { email, password, name } = req.body
 
-      const user = await userService.createUser(email, password)
+      const user = await userService.createUser({ email, password, name })
       const tokens = issueTokens(user.id)
 
       await userService.updateUser(user.id, { refreshToken: tokens.refresh })

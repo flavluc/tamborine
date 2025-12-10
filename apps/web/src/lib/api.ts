@@ -1,7 +1,7 @@
 'use client'
 
 import { env } from './env'
-import { useToken } from './token'
+import { useAuth } from './token'
 
 let refreshing: Promise<string | null> | null = null
 
@@ -23,8 +23,9 @@ async function refreshAccess(): Promise<string | null> {
 
     const { data } = await res.json()
     const token = data?.access ?? null
+    const user = data?.user ?? null
 
-    useToken.getState().setToken(token)
+    useAuth.getState().setSession(token, user)
 
     refreshing = null
     return token
@@ -42,7 +43,7 @@ export async function api<T = unknown>(
   options: RequestInit = {},
   attempt = 0
 ): Promise<T> {
-  const token = useToken.getState().accessToken
+  const token = useAuth.getState().accessToken
   const isAuthRoute = path.startsWith('/auth')
 
   const headers = new Headers(options.headers)

@@ -18,6 +18,8 @@ export type Id = z.infer<typeof Id>
 export const Email = z.email()
 export const Password = z.string().min(6).max(128)
 
+export const UserName = z.string().min(2, 'Name too short').max(80, 'Name too long')
+
 export const ISODate = z.iso.datetime({ offset: true }).brand<'ISODate'>()
 export type ISODate = z.infer<typeof ISODate>
 

@@ -1,13 +1,31 @@
 import { create } from 'zustand'
 
-type TokenState = {
+export type User = {
+  id: string
+  email: string
+  name: string
+}
+
+type AuthState = {
   accessToken: string | null
-  setToken: (t: string | null) => void
+  user: User | null
+  setSession: (accessToken: string, user: User) => void
   clear: () => void
 }
 
-export const useToken = create<TokenState>((set) => ({
+export const useAuth = create<AuthState>((set) => ({
   accessToken: null,
-  setToken: (t) => set({ accessToken: t }),
-  clear: () => set({ accessToken: null }),
+  user: null,
+
+  setSession: (accessToken, user) =>
+    set({
+      accessToken,
+      user,
+    }),
+
+  clear: () =>
+    set({
+      accessToken: null,
+      user: null,
+    }),
 }))

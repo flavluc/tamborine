@@ -10,7 +10,7 @@ const authCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString()
 }
 
-interface CreateParams {
+type CreateParams = {
   userId: string
   pan: string
   brand: string
@@ -40,7 +40,7 @@ export async function create({
   return toTransactionDTO(transaction)
 }
 
-interface ListParams {
+type ListParams = {
   userId: string
   page: number
   limit: number

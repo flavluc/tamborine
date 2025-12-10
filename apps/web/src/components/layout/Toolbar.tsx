@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { api } from '@/lib/api'
-import { useToken } from '@/lib/token'
+import { useAuth } from '@/lib/token'
 
 export default function Toolbar() {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { accessToken, clear } = useToken()
+  const { user, accessToken, clear } = useAuth()
 
   async function handleLogout() {
     try {
@@ -29,9 +29,10 @@ export default function Toolbar() {
       <h1 className="text-lg font-semibold tracking-tight">Tamborine</h1>
 
       <div className="flex items-center space-x-4">
-        {accessToken ? (
+        {accessToken && user ? (
           <>
-            <span className="text-sm text-gray-600">Logged in</span>
+            <span className="text-sm text-gray-600">{user.name}</span>
+
             <Button className="cursor-pointer" variant="outline" onClick={handleLogout}>
               Logout
             </Button>

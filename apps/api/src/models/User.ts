@@ -4,6 +4,7 @@ import mongoose, { Schema, type HydratedDocument, type Model } from 'mongoose'
 export interface IUser {
   email: string
   password: string // hashed
+  name: string
   refreshToken?: string | null
   createdAt: Date
   updatedAt: Date
@@ -15,6 +16,7 @@ const UserSchema = new Schema<IUser>(
   {
     email: { type: String, unique: true, required: true, index: true },
     password: { type: String, required: true },
+    name: { type: String, required: true },
     refreshToken: { type: String, default: null },
   },
   {
@@ -30,6 +32,7 @@ export function toUserDTO(user: UserDocument): UserDTO {
     id: Id.parse(user._id.toString()),
     email: user.email,
     password: user.password,
+    name: user.name,
     createdAt: ISODate.parse(user.createdAt.toISOString()),
     updatedAt: ISODate.parse(user.updatedAt.toISOString()),
   }

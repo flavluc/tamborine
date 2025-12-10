@@ -10,13 +10,13 @@ import { Button } from '@/components/ui/button'
 import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
-import { useToken } from '@/lib/token'
+import { useAuth } from '@/lib/token'
 
 type FormData = z.infer<typeof LoginRequest>
 
 export default function LoginPage() {
   const router = useRouter()
-  const setToken = useToken((s) => s.setToken)
+  const setSession = useAuth((s) => s.setSession)
 
   const form = useForm<FormData>({
     resolver: zodResolver(LoginRequest),
@@ -30,12 +30,11 @@ export default function LoginPage() {
         body: JSON.stringify(values),
       })
 
-      // Save token and redirect
-      setToken(res.data.access)
+      setSession(res.data.access, res.data.user)
       router.push('/dashboard')
     } catch (err) {
       console.error(err)
-      const message = 'Registration failed, please try again.'
+      const message = 'Invalid email or password.'
       form.setError('email', { message })
     }
   }
