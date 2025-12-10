@@ -21,10 +21,12 @@ describe('Authentication Integration', () => {
   })
 
   async function registerUser(email: string, password: string) {
+    const name = 'foo'
+
     const res = await app.inject({
       method: 'POST',
       url: '/auth/register',
-      payload: { email, password },
+      payload: { name, email, password },
     })
 
     const { data } = res.json()
@@ -36,11 +38,12 @@ describe('Authentication Integration', () => {
   it('registers a user and returns tokens', async () => {
     const email = 'test@email.com'
     const password = 'my_very_strong_password'
+    const name = 'foo'
 
     const res = await app.inject({
       method: 'POST',
       url: '/auth/register',
-      payload: { email, password },
+      payload: { name, email, password },
     })
 
     expect(res.statusCode).toBe(201)

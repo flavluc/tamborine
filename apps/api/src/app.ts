@@ -18,15 +18,14 @@ const __dirname = path.dirname(__filename)
 
 export const createServer = async (env: Env): Promise<FastifyInstance> => {
   const app = Fastify({
-    logger: true,
+    logger: env.NODE_ENV !== 'test',
   }).withTypeProvider<ZodTypeProvider>()
 
   app.setValidatorCompiler(validatorCompiler)
   app.setSerializerCompiler(serializerCompiler)
 
   app.setErrorHandler((error, _req, reply) => {
-    //@TODO: add proper logging
-    console.error(error)
+    app.log.error(error)
 
     if (error instanceof ZodError) return badRequest(reply, z.treeifyError(error))
 

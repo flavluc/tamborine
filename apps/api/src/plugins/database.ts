@@ -15,9 +15,9 @@ export default fp(async (app) => {
       return true
     })
 
-    console.log('MongoDB connected')
+    app.log.debug('MongoDB connected')
   } catch (error) {
-    console.log(`MongoDB connection error: ${error}`)
+    app.log.error(`MongoDB connection error: ${error}`)
     throw error
   }
 })

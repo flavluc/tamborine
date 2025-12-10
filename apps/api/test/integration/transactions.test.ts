@@ -22,11 +22,12 @@ describe('Transactions Integration', () => {
   async function registerAndLogin() {
     const email = 'tx@email.com'
     const password = 'very_strong_password'
+    const name = 'foo'
 
     const res = await app.inject({
       method: 'POST',
       url: '/auth/register',
-      payload: { email, password },
+      payload: { name, email, password },
     })
 
     expect(res.statusCode).toBe(201)
@@ -71,7 +72,7 @@ describe('Transactions Integration', () => {
 
     expect(data.status).toBe('approved')
     expect(data.authorizationCode).toBeDefined()
-    expect(data.pan).toBe('************1111')
+    expect(data.pan).toBe('4111111111111111')
     expect(data.timestamp).toBeDefined()
   })
 
@@ -85,9 +86,9 @@ describe('Transactions Integration', () => {
         authorization: `Bearer ${token}`,
       },
       payload: {
-        pan: '4111',
+        pan: '4111111111111111',
         brand: 'Visa',
-        amount: 100,
+        amount: 2000,
       },
     })
 
@@ -151,9 +152,9 @@ describe('Transactions Integration', () => {
       url: '/transactions',
       headers: { authorization: `Bearer ${token}` },
       payload: {
-        pan: '4111',
+        pan: '4111111111111111',
         brand: 'Visa',
-        amount: 100,
+        amount: 2000,
       },
     })
 
