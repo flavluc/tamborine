@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { api } from '@/lib/api'
 import { formatCurrencyBRL, formatPanDisplay, formatTimestamp } from '@/lib/formatters'
 
-const ITEMS_PER_PAGE = 2
+const ITEMS_PER_PAGE = 10
 
 export function TransactionsTable() {
   const [page, setPage] = useState(1)
